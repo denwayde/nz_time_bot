@@ -20,6 +20,8 @@ dt(dt.now().year, dt.now().month, dt.now().day+1).date()
 # ТЕПЕРЬ НУЖНО ПРИДУМАТЬ КАК МОЖНО ВЫЧИТАТЬ ВРЕМЕНА!!!!ПРИДУМАНО СМОТРИ НИЖЕ
 dt(dt.now().year, dt.now().month, dt.now().day+1, dt.now().hour, dt.now().minute, )
 a = time.ctime(time.time()-2400)
-# ПРЕОБРАЗОВАННОЕ ВРЕМЯ ПРИДЕТСЯ ВЫКОВЫРИВАТЬ ТОКО ТАК!
+# ПРЕОБРАЗОВАННОЕ ВРЕМЯ ПРИДЕТСЯ ВЫКОВЫРИВАТЬ ТОКа ТАК!
 match_time = re.search(r'\s\d\d\:\d\d', a)
 # print(match_time[0])
+
+# ТЕПЕРЬ НУЖНО ПРОВЕРИТЬ РАБОТУ НАПОМИНАТЕЛЯ !!!!!

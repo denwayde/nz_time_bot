@@ -13,15 +13,21 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 
-@dp.message_handler(commands=['start', 'help'])
+@dp.message_handler(commands=['start', 'help'])  # eng rus
 async def send_welcome(message: types.Message):
+    # buttons = [
+    #     types.InlineKeyboardButton(text="", callback_data="")
+    # ]
+    # reply_markup=buttons
+    await message.reply("Здравствуйте это бот для напоминания об НЗ.")
 
-    await message.reply("Здравствуйте это бот для напоминания о намазе")
 
+'''@dp.callback_query(text="random_value")
+async def send_random_value(callback: types.CallbackQuery):'''
 
-@dp.message_handler()
-async def echo(message: types.Message):
-    await message.answer(message.text)
+# @dp.message_handler()
+# async def echo(message: types.Message):
+#     await message.answer(message.text)
 
 
 if __name__ == '__main__':
