@@ -1,26 +1,50 @@
 import logging
 
 from aiogram import Bot, Dispatcher, executor, types
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from config_reader import config
 
 API_TOKEN = config.bot_token.get_secret_value()
 
+
+class SetConfigsToBot(StatesGroup):
+    waiting_for_choose_country = State()
+    waiting_for_choose_city = State()
+
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
-
+memstore = MemoryStorage()
 # Initialize bot and dispatcher
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot, storage=memstore)
 
 
-@dp.message_handler(commands=['start', 'help'])  # eng rus
-async def send_welcome(message: types.Message):
+@dp.message_handler(commands='start', state="*")
+async def send_welcome(message: types.Message, state: FSMContext):
     # buttons = [
     #     types.InlineKeyboardButton(text="", callback_data="")
     # ]
     # reply_markup=buttons
-    await message.reply("Здравствуйте это бот для напоминания об НЗ.")
+    await message.answer("Здравствуйте это бот для напоминания об НЗ. Тут рассказываем что бот делает, как работает и тд. Давайте выполним первоначальные настройки. Напишите боту страну в которой вы проживаете")
+    await state.set_state(SetConfigsToBot.waiting_for_choose_country.state)
 
+
+@dp.message_handler(state=SetConfigsToBot.waiting_for_choose_country)
+async def choosen_country_handler(message: types.Message, state: FSMContext):
+    await state.update_data(chosen_country=message.text)
+    await message.answer(f"Вы выбрали страну {message.text}. Теперь выберите город в котором Вы проживаете. ")
+    await state.set_state(SetConfigsToBot.waiting_for_choose_city.state)
+
+
+@dp.message_handler(state=SetConfigsToBot.waiting_for_choose_city)
+async def choosen_country_handler(message: types.Message, state: FSMContext):
+    await state.update_data(chosen_city=message.text)
+    user_data = await state.get_data()
+    await message.answer(f"Вы выбрали город {message.text} и страну {user_data['chosen_country']}")
+    await state.finish()
 
 '''@dp.callback_query(text="random_value")
 async def send_random_value(callback: types.CallbackQuery):'''
