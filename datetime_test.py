@@ -1,6 +1,13 @@
 from datetime import datetime as dt
 import time
+
+import pytz
 import re
+
+
+tz_moscow = pytz.timezone("Europe/London")# ДОСТАЕМ ТАЙМЗОН ИЗ БД СРАВНИВАЕМ ТЕКУЩИЕ ВРЕМЕНА ПОЛУЧАЕМ ДЕЛЬТА В ЧАСАХ ---) ЭТУ ДЕЛЬТА БУДЕМ ПРИБАВЛЯТЬ ИЛИ ВЫЧИТАТЬ В ТЕ ТАЙМЗОНЫ ЧТО ЛЕЖАТ В БД
+
+print(dt.now(tz_moscow))
 
 stringed_time = "17-03-2023"
 date_obj = dt.strptime(stringed_time, "%d-%m-%Y")
