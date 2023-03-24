@@ -1,8 +1,12 @@
 import requests
-import json
+from datetime import datetime as dt
+import time
+
+import pytz
+import re
 
 resp = requests.get(
-    "http://api.aladhan.com/v1/calendarByCity/2023/3?city=london&country=united&kingdom&method=14&school=1")
+    "http://api.aladhan.com/v1/calendarByCity/2023/3?city=Москва&country=Россия&method=14&school=1")
 
 # resp.json()['data'][21]['timings'] vremenena nz
 # resp.json()['data'][21]['date']['gregorian']['date'] data kotoruy nuzno preobrazovat v nuznii format pered sohraneniem v bd
@@ -11,4 +15,8 @@ resp = requests.get(
 # resp.json()['data'][21]['meta']['timezone'] timezonechik
 
 
-print(resp.json()['data'][21]['meta']['timezone'])
+timings = resp.json()['data'][21]['timings']
+
+for x in timings:
+    time_match = re.search(r'\d\d\:\d\d', timings[x])
+    print(time_match[0])
