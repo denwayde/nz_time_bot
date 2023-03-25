@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 import time
 
 import pytz
@@ -7,6 +7,8 @@ import re
 
 resp = requests.get(
     "http://api.aladhan.com/v1/calendarByCity/2023/3?city=Москва&country=Россия&method=14&school=1")
+
+tz_moscow = pytz.timezone("Europe/Moscow")
 
 # resp.json()['data'][21]['timings'] vremenena nz
 # resp.json()['data'][21]['date']['gregorian']['date'] data kotoruy nuzno preobrazovat v nuznii format pered sohraneniem v bd
@@ -16,7 +18,19 @@ resp = requests.get(
 
 
 timings = resp.json()['data'][21]['timings']
+print(timings)
+tmings_arr = []
+delta_time = dt.now(tz_moscow).hour-dt.now().hour
 
 for x in timings:
-    time_match = re.search(r'\d\d\:\d\d', timings[x])
-    print(time_match[0])
+    time_match = re.search(r'(\d\d)\:(\d\d)', timings[x])
+
+    dt_obj = dt(dt.now().year, dt.now().month, dt.now().day +
+                1, int(time_match[1]), int(time_match[2]))
+
+    d = dt_obj + timedelta(hours=delta_time, minutes=0)
+    # print(d.strftime('%H:%M'))
+    tmings_arr.append(d.strftime('%H:%M'))
+
+# СДЕЛАЛИ ВРЕМЕНА ДЛЯ ТАСКОВ СКОРЕЕ ВСЕГО ОБЪЕДИНЯТЬ ИХ В МАССИВ НЕ ОБЯЗАТЕЛЬНО
+print(tmings_arr)

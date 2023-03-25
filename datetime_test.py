@@ -14,7 +14,7 @@ msk_time_match = re.search(r'\d\d\:\d\d', full_msk_time)
 
 
 # print(dt.now(tz_moscow).hour-dt.now().hour) ###---TIMEDELTA
-
+delta_time = dt.now(tz_moscow).hour-dt.now().hour
 
 stringed_time = "17-03-2023"
 date_obj = dt.strptime(stringed_time, "%d-%m-%Y")
@@ -26,9 +26,11 @@ date_obj = dt.strptime(stringed_time, "%d-%m-%Y")
 
 # так можно манипулировать датами(так мы прибавили один день к текушей дате)
 dt_obj = dt(dt.now().year, dt.now().month, dt.now().day +
-            1, dt.now().hour, dt.now().minute)
+            1, dt.now().hour + delta_time, dt.now().minute)
 
-print(str(dt_obj.time()))
+print(dt_obj.date())
+print()
+print(dt_obj.time())
 
 
 # КУДА ТО НУЖНО СОХРАНЯТЬ ТЕКУЩУЮ ДАТУ И КАЖДЫЙ ДЕНЬ СРАВНИВАТЬ ЕЕ
