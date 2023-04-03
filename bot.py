@@ -12,6 +12,8 @@ API_TOKEN = config.bot_token.get_secret_value()
 class SetConfigsToBot(StatesGroup):
     waiting_for_choose_country = State()
     waiting_for_choose_city = State()
+    waiting_for_choose_mazhab = State()
+    waiting_for_choose_delta_time = State()
 
 
 # Configure logging
@@ -40,10 +42,36 @@ async def choosen_country_handler(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=SetConfigsToBot.waiting_for_choose_city)
-async def choosen_country_handler(message: types.Message, state: FSMContext):
+async def choosen_city_handler(message: types.Message, state: FSMContext):
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    buttons = ["Ханафи", "Шафии"]
+    keyboard.add(*buttons)
     await state.update_data(chosen_city=message.text)
+    await message.answer(f"Вы выбрали город {message.text}. Теперь выберите мзхб", reply_markup=keyboard)
+    await state.set_state(SetConfigsToBot.waiting_for_choose_mazhab.state)
+    # user_data = await state.get_data()
+    # await message.answer(f"Вы выбрали город {message.text} и страну {user_data['chosen_country']}")
+    # await state.finish()
+
+
+@dp.message_handler(state=SetConfigsToBot.waiting_for_choose_mazhab)
+async def choosen_mazhab_handler(message: types.Message, state: FSMContext):
+    # reply_markup=types.ReplyKeyboardRemove() чтобы удалить клавиатуру
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    buttons = ["С заходом", "За час до окончания", "За полчаса до окончания"]
+    keyboard.add(*buttons)
+    await state.update_data(chosen_mazhab=message.text)
+    await message.answer(f"Вы выбрали мазхаб {message.text}. Теперь выберите удобное для Вас время напоминания о выполнении намаза", reply_markup=keyboard)
+    await state.set_state(SetConfigsToBot.waiting_for_choose_delta_time.state)
+
+
+@dp.message_handler(state=SetConfigsToBot.waiting_for_choose_delta_time)
+async def choosen_mazhab_handler(message: types.Message, state: FSMContext):
+    reply_markup = types.ReplyKeyboardRemove()
+    await state.update_data(chosen_delta=message.text)
     user_data = await state.get_data()
-    await message.answer(f"Вы выбрали город {message.text} и страну {user_data['chosen_country']}")
+    await message.answer(f"Вы выбрали напоминание {message.text}. Настройки завершены.")
+
     await state.finish()
 
 '''@dp.callback_query(text="random_value")

@@ -1,8 +1,11 @@
 import sqlite3
 
-conn = sqlite3.connect("nzt.db")
-cur = conn.cursor()
-cur.execute("ВАШ-SQL-ЗАПРОС-ЗДЕСЬ;")
+# conn = sqlite3.connect("nzt.db")
+# cur = conn.cursor()
+# cur.execute("ВАШ-SQL-ЗАПРОС-ЗДЕСЬ;")
+# conn.commit()
+
+
 # cur.execute("INSERT INTO users VALUES(?, ?, ?, ?);", user)
 # more_users = [('00003', 'Peter', 'Parker', 'Male'), ('00004', 'Bruce', 'Wayne', 'male')]
 # cur.executemany("INSERT INTO users VALUES(?, ?, ?, ?);", more_users)
@@ -17,4 +20,23 @@ cur.execute("ВАШ-SQL-ЗАПРОС-ЗДЕСЬ;")
 # one_result = cur.fetchone()
 # print(one_result)
 
-conn.commit()
+
+def insert_data(insert_one_query, tup):
+    global conn
+    cur = conn.cursor()
+    cur.execute(insert_one_query, tup)
+    conn.commit()
+
+
+def insert_many(insert_many_query, mas):
+    global conn
+    cur = conn.cursor()
+    cur.executemany(insert_many_query, mas)
+    conn.commit()
+
+
+def select_data(selection_query):
+    global conn
+    cur = conn.cursor()
+    cur.execute(selection_query)
+    return cur.fetchmany()
