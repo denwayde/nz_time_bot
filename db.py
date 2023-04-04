@@ -1,6 +1,6 @@
 import sqlite3
 
-# conn = sqlite3.connect("nzt.db")
+conn = sqlite3.connect("nzt.db")
 # cur = conn.cursor()
 # cur.execute("ВАШ-SQL-ЗАПРОС-ЗДЕСЬ;")
 # conn.commit()
@@ -21,10 +21,10 @@ import sqlite3
 # print(one_result)
 
 
-def insert_data(insert_one_query, tup):
+def delete_or_insert_data(delete_or_insert_query, tup=()):
     global conn
     cur = conn.cursor()
-    cur.execute(insert_one_query, tup)
+    cur.execute(delete_or_insert_query, tup)
     conn.commit()
 
 
@@ -35,8 +35,8 @@ def insert_many(insert_many_query, mas):
     conn.commit()
 
 
-def select_data(selection_query):
+def select_data(selection_query, tup=()):
     global conn
     cur = conn.cursor()
-    cur.execute(selection_query)
+    cur.execute(selection_query, tup)
     return cur.fetchmany()
