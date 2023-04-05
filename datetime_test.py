@@ -1,4 +1,4 @@
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 import time
 
 import pytz
@@ -28,9 +28,9 @@ date_obj = dt.strptime(stringed_time, "%d-%m-%Y")
 dt_obj = dt(dt.now().year, dt.now().month, dt.now().day +
             1, dt.now().hour + delta_time, dt.now().minute)
 
-print(dt_obj.date())
-print()
-print(dt_obj.time())
+# print(dt_obj.date())
+# print()
+# print(dt_obj.time())
 
 
 # КУДА ТО НУЖНО СОХРАНЯТЬ ТЕКУЩУЮ ДАТУ И КАЖДЫЙ ДЕНЬ СРАВНИВАТЬ ЕЕ
@@ -45,3 +45,7 @@ match_time = re.search(r'\s\d\d\:\d\d', a)
 # print(match_time[0])
 
 # ТЕПЕРЬ НУЖНО ПРОВЕРИТЬ РАБОТУ НАПОМИНАТЕЛЯ !!!!!
+
+
+d = dt.now() + timedelta(hours=0, minutes=-30)
+print(d.time().strftime('%H:%M'))  # VIPOLNILI VICHET MINUT!!!!TEPER NUJNO PRIDUMAT OTPRAVKU SMISLOVOGO SOOBSHENIA V NUJNOE VREMIA!!!V BD NEOBHODIMO VNOSIT VREMYA VICHETA - TIMEDELTA #SEGODNYA SDELAY SOHRANENIE POLZOVATELYA SO VSEM NEOBHODIMIM
