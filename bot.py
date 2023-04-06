@@ -5,6 +5,13 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from config_reader import config
+from db import delete_or_insert_data as di_d, select_data, insert_many
+import requests
+from datetime import datetime as dt, timedelta
+import time
+import json
+import pytz
+import re
 
 API_TOKEN = config.bot_token.get_secret_value()
 
@@ -70,9 +77,27 @@ async def choosen_mazhab_handler(message: types.Message, state: FSMContext):
     reply_markup = types.ReplyKeyboardRemove()
     await state.update_data(chosen_delta=message.text)
     user_data = await state.get_data()
-    await message.answer(f"Вы выбрали напоминание {message.text}. Настройки завершены.")
+
+    time_delta_minutes = 0
+    if user_data["chosen_delta"] == "За час до окончания":
+        time_delta_minutes = 60
+    elif user_data["chosen_delta"] == "За полчаса до окончания":
+        time_delta_minutes = 30
+
+    mazh = 1
+    if user_data['chosen_mazhab'] == "Шафии":
+        mazh = 0
+
+    di_d("insert into users(telega_id, name, country, city, mazhab, time_delta) values(?,?,?,?,?,?);", (message.chat.id,
+         message.from_user.first_name, user_data['chosen_country'], user_data['chosen_city'], mazh, time_delta_minutes,))
+    resp = requests.get(
+        f"http://api.aladhan.com/v1/calendarByCity/{dt.now().date().year}/{dt.now().date().month}?city={user_data['chosen_city']}&country={user_data['chosen_country']}&method=14&school={mazh}")
+
+    if resp.json()['code'] == 200:
+        await message.answer(f"Вы выбрали напоминание {message.text}. Настройки завершены.", reply_markup=types.ReplyKeyboardRemove())
 
     await state.finish()
+    print(user_data)
 
 '''@dp.callback_query(text="random_value")
 async def send_random_value(callback: types.CallbackQuery):'''
