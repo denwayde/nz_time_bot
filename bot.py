@@ -131,6 +131,13 @@ async def send_random_value(callback: types.CallbackQuery):'''
 #     await message.answer(message.text)
 
 
+async def print_data(dp):
+    users = select_data(
+        "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
+    print(users[0])
+
+
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    executor.start_polling(
+        dispatcher=dp, skip_updates=True, on_startup=print_data)
 # https://aiogram.ru/?p=33 - ссыль на кнопки

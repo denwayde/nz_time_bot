@@ -96,8 +96,6 @@ async def noon_print():
             await asyncio.sleep(1)
 '''
 
-users = select_data(
-    "select*from user_timings inner join users USING(telega_id) where date = ? and telega_id = ?", (dt.now().date(), ))
 
 print(users[0])
 
@@ -109,8 +107,18 @@ async def scheduler():
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
+'''
 
 
 async def on_strtp(_):
+    users = select_data(
+        "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
     asyncio.create_task(scheduler())
-'''
+
+if __name__ == '__main__':
+
+    executor.start_polling(
+        dispatcher=dp,
+        skip_updates=True,
+        on_startup=on_strtp
+    )
