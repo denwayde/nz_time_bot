@@ -1,5 +1,4 @@
 import logging
-
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
@@ -13,8 +12,6 @@ import json
 import pytz
 import re
 
-API_TOKEN = config.bot_token.get_secret_value()
-
 
 class SetConfigsToBot(StatesGroup):
     waiting_for_choose_country = State()
@@ -22,6 +19,8 @@ class SetConfigsToBot(StatesGroup):
     waiting_for_choose_mazhab = State()
     waiting_for_choose_delta_time = State()
 
+
+API_TOKEN = config.bot_token.get_secret_value()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -94,7 +93,32 @@ async def choosen_mazhab_handler(message: types.Message, state: FSMContext):
         f"http://api.aladhan.com/v1/calendarByCity/{dt.now().date().year}/{dt.now().date().month}?city={user_data['chosen_city']}&country={user_data['chosen_country']}&method=14&school={mazh}")
 
     if resp.json()['code'] == 200:
-        await message.answer(f"Вы выбрали напоминание {message.text}. Настройки завершены.", reply_markup=types.ReplyKeyboardRemove())
+        await message.answer(f"Вы выбрали напоминание {message.text}. Настройки завершены. Бот будет напоминать ", reply_markup=types.ReplyKeyboardRemove())
+        timings_data = []
+        for z in resp.json()['data']:
+            times_arr = []
+            for v in z['timings']:
+                if v != 'Sunrise' and v != 'Imsak' and v != 'Midnight' and v != 'Firstthird':
+                    times_for_nz = z['timings'][v]
+                    obj_times_for_nz = re.search(r'\d\d\:\d\d', times_for_nz)
+                    times_arr.append(obj_times_for_nz[0])
+
+            # ОБРАБОТКА ДАТЫ В НУЖНЫЙ ФОРМАТ
+            dt_str = z['date']['gregorian']['date']
+            dt_str_conv = dt.strptime(dt_str, '%d-%m-%Y').date()
+
+            # СОЗДАНИЕ СПИСКА ДЛЯ МАССИВА
+            mem_tuple = tuple((message.chat.id, json.dumps(times_arr), z['meta']
+                               ['timezone'], str(dt_str_conv), json.dumps(z['date']['hijri']['holidays'])))
+            # ДОБАВЛЕНИЕ СПИСКА В МАССИВ
+            timings_data.append(mem_tuple)
+            mem_tuple = ()
+
+        insert_many(
+            "INSERT INTO user_timings(telega_id, timings, timezone, date, holidays) VALUES(?, ?, ?, ?, ?);", timings_data)
+        print("Inserted")
+    else:
+        await message.answer("Что-то пошло не так. Возможно вы опечатались в названии своей страны или города или сервер временно недоступен. Попробуйте повторить процедуру натройки.")
 
     await state.finish()
     print(user_data)
