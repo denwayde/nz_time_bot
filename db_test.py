@@ -79,41 +79,48 @@ for x in timings_arr_from_db:
 
 # print(tmings_arr) # здесь те времена что преобразованы окончательно !!!НУЖНО ЕЩЕ ПОРАБОТАТЬ С TIMEDELTA ЕСЛИ ЮЗЕР РЕШИТ ЗА ОПРЕДЕЛЕННОЕ ВРЕМЯ ПРОСИТЬ ПРЕДУПРЕЖДЕНИЕ
 
-'''
-async def noon_print():
-    d = datetime.datetime.now().strftime("%Y-%m-%d")
-    ids = db_handler.get_data("SELECT telega_id FROM teachers")
-    kur_ids = db_handler.get_data(
-        "SELECT DISTINCT telega_id FROM kuramshin_otchet WHERE date = ?", (d,))
-    for x in ids:
-        for v in kur_ids:
-            if x == v:
-                ids.remove(v)
-    for z in ids:
-        try:
-            await bot.send_message(z[0], "Доброго времени суток, отправьте пожалуйста отчет посещаемости")
-        except BotBlocked:
-            await asyncio.sleep(1)
-'''
+
+async def noon_print(mes):
+    users = select_data(
+        "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
+    for j in users:
+        for v in j:
+            try:
+                await bot.send_message(v[1], mes)
+            except BotBlocked:
+                await asyncio.sleep(1)
 
 
-print(users[0])
+async def timings_from_bd():
+    timings = select_data(
+        "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
+    return timings
 
-'''
+
 async def scheduler():
-    aioschedule.every().day.at("08:17").do(noon_print)
-    aioschedule.every().day.at("09:13").do(noon_print)
-    aioschedule.every().day.at("17:47").do(noon_print)
+    # tut budet funkcia vishe
+    for z in timings:
+        t_a = json.loads(z[2])
+        print(t_a)
+        for x in t_a:
+            if t_a.index(x) == 1:
+                aioschedule.every().day.at(x).do(noon_print, mes="Прочитай ойля")
+            elif t_a.index(x) == 2:
+                aioschedule.every().day.at(x).do(noon_print, mes="Прочитай ikende")
+            elif t_a.index(x) == 3:
+                aioschedule.every().day.at(x).do(noon_print, mes="Прочитай ikende")
+            elif t_a.index(x) == 4:
+                aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Aksham")
+            elif t_a.index(x) == 5:
+                aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Isha")
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
-'''
 
 
 async def on_strtp(_):
-    users = select_data(
-        "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
     asyncio.create_task(scheduler())
+
 
 if __name__ == '__main__':
 
