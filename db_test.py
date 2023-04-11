@@ -91,14 +91,19 @@ async def noon_print(mes):
                 await asyncio.sleep(1)
 
 
+timings = []
 async def timings_from_bd():
-    timings = select_data(
+    global timings
+    timings = await select_data(
         "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
-    return timings
+    
 
 
 async def scheduler():
+    
     # tut budet funkcia vishe
+    aioschedule.every(1).minutes.do(timings_from_bd)
+
     for z in timings:
         t_a = json.loads(z[2])
         print(t_a)
