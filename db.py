@@ -1,5 +1,5 @@
 import sqlite3
-
+from datetime import datetime as dt, timedelta
 conn = sqlite3.connect("nzt.db")
 # cur = conn.cursor()
 # cur.execute("ВАШ-SQL-ЗАПРОС-ЗДЕСЬ;")
@@ -40,3 +40,11 @@ def select_data(selection_query, tup=()):
     cur = conn.cursor()
     cur.execute(selection_query, tup)
     return cur.fetchmany()
+
+out = select_data(
+        "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
+print(out)
+print()
+for j in out:
+    print(j)   
+    
