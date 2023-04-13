@@ -91,13 +91,14 @@ async def noon_print(mes):
             
 
 
+async def timings_from_bd():
+    aioschedule.clear()
 
-async def timings_from_bd(): 
     timings = select_data(
         "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
     for z in timings:
-        #t_a = json.loads(z[2])
-        t_a = ['04:20', '13:17', '15:13', '15:15', '14:50', '15:17', '02:58']
+        t_a = json.loads(z[2])
+        #t_a = ['04:20', '21:40', '21:45', '21:47', '14:50', '21:50', '02:58']
         #print(t_a)
         for x in t_a:
             if t_a.index(x) == 1:
@@ -105,8 +106,6 @@ async def timings_from_bd():
             elif t_a.index(x) == 2:
                 aioschedule.every().day.at(x).do(noon_print, mes="Прочитай ikende")
             elif t_a.index(x) == 3:
-                aioschedule.every().day.at(x).do(noon_print, mes="Прочитай ikende")
-            elif t_a.index(x) == 4:
                 aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Aksham")
             elif t_a.index(x) == 5:
                 aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Isha")
@@ -117,8 +116,7 @@ async def timings_from_bd():
 
 
 async def scheduler():
-    
-    aioschedule.every(1).seconds.do(timings_from_bd)
+    aioschedule.every(5).minutes.do(timings_from_bd)
 
     while True:
         await aioschedule.run_pending()
@@ -136,3 +134,8 @@ if __name__ == '__main__':
         skip_updates=True,
         on_startup=on_strtp
     )
+
+# t_a = ['04:20', '13:17', '15:13', '15:15', '14:50', '15:17', '02:58']
+#         #print(t_a)
+# for x in t_a:
+#     print(f"{x}:00")
