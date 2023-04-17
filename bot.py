@@ -79,9 +79,9 @@ async def choosen_mazhab_handler(message: types.Message, state: FSMContext):
 
     time_delta_minutes = 0
     if user_data["chosen_delta"] == "За час до окончания":
-        time_delta_minutes = 60
+        time_delta_minutes = -60
     elif user_data["chosen_delta"] == "За полчаса до окончания":
-        time_delta_minutes = 30
+        time_delta_minutes = -30  #TUT MOGUT BIT PROBLEMI
 
     mazh = 1
     if user_data['chosen_mazhab'] == "Шафии":
@@ -101,6 +101,7 @@ async def choosen_mazhab_handler(message: types.Message, state: FSMContext):
                 if v != 'Sunrise' and v != 'Imsak' and v != 'Midnight' and v != 'Firstthird':
                     times_for_nz = z['timings'][v]
                     obj_times_for_nz = re.search(r'\d\d\:\d\d', times_for_nz)
+
                     times_arr.append(obj_times_for_nz[0])
 
             # ОБРАБОТКА ДАТЫ В НУЖНЫЙ ФОРМАТ

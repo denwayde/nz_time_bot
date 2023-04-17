@@ -31,14 +31,21 @@ resp = requests.get(
 # resp.json()['code'] doljno bit 200
 telega_id = 123456789
 timings_data = []
+timezone = resp.json()['data'][0]['meta']['timezone']#TIMEZONE
+
 for z in resp.json()['data']:
+
     times_arr = []
     for v in z['timings']:
         if v != 'Sunrise' and v != 'Imsak' and v != 'Midnight' and v != 'Firstthird':
             times_for_nz = z['timings'][v]
-            obj_times_for_nz = re.search(r'\d\d\:\d\d', times_for_nz)
-            times_arr.append(obj_times_for_nz[0])
+            #print(times_for_nz)
+            obj_times_for_nz = re.search(r'(\d\d)\:(\d\d)', times_for_nz)
+            #print(obj_times_for_nz[0])
 
+            times_arr.append(obj_times_for_nz[0])
+    
+'''
     # ОБРАБОТКА ДАТЫ В НУЖНЫЙ ФОРМАТ
     dt_str = z['date']['gregorian']['date']
     dt_str_conv = dt.strptime(dt_str, '%d-%m-%Y').date()
@@ -50,7 +57,8 @@ for z in resp.json()['data']:
     timings_data.append(mem_tuple)
 
     mem_tuple = ()
-
+'''
+# print(timings_data)
 
 # insert_many("INSERT INTO user_timings(telega_id, timings, timezone, date, holidays) VALUES(?, ?, ?, ?, ?);", timings_data)
 # print("Inserted")
@@ -61,25 +69,25 @@ out = select_data("select*from user_timings where date = ?",
 
 timings_arr_from_db = json.loads(out[0][2])  # ВРЕМЕНА ИЗ БД
 
-# print(timings_arr_from_db) #здесь те времена что извлечены из БД
+print(timings_arr_from_db) #здесь те времена что извлечены из БД
 
 tz_moscow = pytz.timezone(out[0][-3])
 tmings_arr = []
 delta_time = dt.now(tz_moscow).hour-dt.now().hour
+time_delta_minutes = 0
 
 for x in timings_arr_from_db:
     time_match = re.search(r'(\d\d)\:(\d\d)', x)
 
-    dt_obj = dt(dt.now().year, dt.now().month, dt.now().day +
-                1, int(time_match[1]), int(time_match[2]))
+    dt_obj = dt(dt.now().year, dt.now().month, dt.now().day, int(time_match[1]), int(time_match[2]))
 
-    d = dt_obj + timedelta(hours=delta_time, minutes=0)
+    d = dt_obj + timedelta(hours=delta_time, minutes=time_delta_minutes)
 
     tmings_arr.append(d.strftime('%H:%M'))
 
-# print(tmings_arr) # здесь те времена что преобразованы окончательно !!!НУЖНО ЕЩЕ ПОРАБОТАТЬ С TIMEDELTA ЕСЛИ ЮЗЕР РЕШИТ ЗА ОПРЕДЕЛЕННОЕ ВРЕМЯ ПРОСИТЬ ПРЕДУПРЕЖДЕНИЕ
+print(tmings_arr) # здесь те времена что преобразованы окончательно !!!НУЖНО ЕЩЕ ПОРАБОТАТЬ С TIMEDELTA ЕСЛИ ЮЗЕР РЕШИТ ЗА ОПРЕДЕЛЕННОЕ ВРЕМЯ ПРОСИТЬ ПРЕДУПРЕЖДЕНИЕ
 
-
+'''
 async def noon_print(mes):
     users = select_data(
         "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
@@ -135,7 +143,4 @@ if __name__ == '__main__':
         on_startup=on_strtp
     )
 
-# t_a = ['04:20', '13:17', '15:13', '15:15', '14:50', '15:17', '02:58']
-#         #print(t_a)
-# for x in t_a:
-#     print(f"{x}:00")
+'''
