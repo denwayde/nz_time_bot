@@ -3,6 +3,7 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.utils.exceptions import BotBlocked
 from config_reader import config
 from db import delete_or_insert_data as di_d, select_data, insert_many
 import requests
@@ -10,6 +11,8 @@ from datetime import datetime as dt, timedelta
 import json
 import pytz
 import re
+import asyncio
+import aioschedule
 
 
 class SetConfigsToBot(StatesGroup):
@@ -135,8 +138,67 @@ async def send_random_value(callback: types.CallbackQuery):'''
 # async def echo(message: types.Message):
 #     await message.answer(message.text)
 
+async def noon_print(mes):
+    users = select_data(
+        "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
+    for j in users:
+        try:
+            await bot.send_message(j[1], mes)
+        except BotBlocked:
+            await asyncio.sleep(1)
+            
+
+
+async def timings_from_bd():
+    aioschedule.clear()
+
+    timings = select_data("select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
+ 
+    for z in timings:
+        t_a = json.loads(z[2])
+        if z[-1] == 0:
+            #t_a = ['04:20', '21:40', '21:45', '21:47', '14:50', '21:50', '02:58']
+            #print(t_a)
+            for x in t_a:
+                if t_a.index(x) == 1:
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай ойля")
+                elif t_a.index(x) == 2:
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай ikende")
+                elif t_a.index(x) == 3:
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Aksham")
+                elif t_a.index(x) == 5:
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Isha")
+        elif z[-1] == -60:
+            for x in t_a:
+                if t_a.index(x) == 1:
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай ойля")
+                elif t_a.index(x) == 2:
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай ikende")
+                elif t_a.index(x) == 3:
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Aksham")
+                elif t_a.index(x) == 5:
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Isha")
+
+
+
+async def scheduler():
+    aioschedule.every(5).minutes.do(timings_from_bd)
+
+    while True:
+        await aioschedule.run_pending()
+        await asyncio.sleep(1)
+
+
+async def on_strtp(_):
+    asyncio.create_task(scheduler())
+
 
 if __name__ == '__main__':
+
     executor.start_polling(
-        dispatcher=dp, skip_updates=True)
+        dispatcher=dp,
+        skip_updates=True,
+        on_startup=on_strtp
+    )
+
 # https://aiogram.ru/?p=33 - ссыль на кнопки

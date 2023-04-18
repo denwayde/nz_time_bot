@@ -41,9 +41,9 @@ def select_data(selection_query, tup=()):
     cur.execute(selection_query, tup)
     return cur.fetchmany()
 
-# out = select_data(
-#         "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
-# print(out)
+out = select_data(
+        "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
+print(out)
 # print()
 # for j in out:
 #     print(j)   
