@@ -31,29 +31,32 @@ resp = requests.get(
 # resp.json()['code'] doljno bit 200
 telega_id = 123456789
 timings_data = []
-timezone = resp.json()['data'][0]['meta']['timezone']#TIMEZONE
+# timezone = resp.json()['data'][0]['meta']['timezone']#TIMEZONE
 times_arr = []
 
+# PROBLEMA RESHENA. TEPER SDELAY IZ ETOGO FUNKCIU I SDELAY MODUL FUNCTIONS
 
-tz_moscow = pytz.timezone(timezone)
-delta_time = dt.now(tz_moscow).hour-dt.now().hour
-time_delta_minutes = 0
 
-for z in resp.json()['data']:
-    tmings_arr = []
-    for v in z['timings']:
-        if v != 'Sunrise' and v != 'Imsak' and v != 'Midnight' and v != 'Firstthird':
-            times_for_nz = z['timings'][v]
-            #print(times_for_nz)
-            obj_times_for_nz = re.search(r'(\d\d)\:(\d\d)', times_for_nz)
-            #print(obj_times_for_nz[1] + '--' + obj_times_for_nz[1]) тут мы получаем времена из АПИ
-            dt_obj = dt(dt.now().year, dt.now().month, dt.now().day, int(obj_times_for_nz[1]), int(obj_times_for_nz[2]))
+def time_converter(timezone, time_delta_minutes, response):
+    tz_moscow = pytz.timezone(timezone)
+    delta_time = dt.now(tz_moscow).hour-dt.now().hour
+    for z in response.json()['data']:
+        tmings_arr = []
+        for v in z['timings']:
+            if v != 'Sunrise' and v != 'Imsak' and v != 'Midnight' and v != 'Firstthird':
+                times_for_nz = z['timings'][v]
+                # print(times_for_nz)
+                obj_times_for_nz = re.search(r'(\d\d)\:(\d\d)', times_for_nz)
+                # print(obj_times_for_nz[1] + '--' + obj_times_for_nz[1]) тут мы получаем времена из АПИ
+                dt_obj = dt(dt.now().year, dt.now().month, dt.now().day, int(
+                    obj_times_for_nz[1]), int(obj_times_for_nz[2]))
 
-            d = dt_obj + timedelta(hours=delta_time, minutes=time_delta_minutes)
-            tmings_arr.append(d.strftime('%H:%M'))
-            #times_arr.append(obj_times_for_nz[0])
-    print(tmings_arr)#PROBLEMA RESHENA. TEPER SDELAY IZ ETOGO FUNKCIU I SDELAY MODUL FUNCTIONS
-    
+                d = dt_obj + timedelta(hours=delta_time, minutes=time_delta_minutes)
+                tmings_arr.append(d.strftime('%H:%M'))
+        return tmings_arr
+
+
+print(time_converter(resp.json()['data'][0]['meta']['timezone'], -30, resp))
 '''
     # ОБРАБОТКА ДАТЫ В НУЖНЫЙ ФОРМАТ
     dt_str = z['date']['gregorian']['date']
@@ -78,7 +81,7 @@ out = select_data("select*from user_timings where date = ?",
 
 timings_arr_from_db = json.loads(out[0][2])  # ВРЕМЕНА ИЗ БД
 
-print(timings_arr_from_db) #здесь те времена что извлечены из БД
+# print(timings_arr_from_db)  # здесь те времена что извлечены из БД
 
 tz_moscow = pytz.timezone(out[0][-3])
 tmings_arr = []
@@ -88,13 +91,14 @@ time_delta_minutes = 0
 for x in timings_arr_from_db:
     time_match = re.search(r'(\d\d)\:(\d\d)', x)
 
-    dt_obj = dt(dt.now().year, dt.now().month, dt.now().day, int(time_match[1]), int(time_match[2]))
+    dt_obj = dt(dt.now().year, dt.now().month, dt.now().day,
+                int(time_match[1]), int(time_match[2]))
 
     d = dt_obj + timedelta(hours=delta_time, minutes=time_delta_minutes)
 
     tmings_arr.append(d.strftime('%H:%M'))
 
-#print(tmings_arr) # здесь те времена что преобразованы окончательно !!!НУЖНО ЕЩЕ ПОРАБОТАТЬ С TIMEDELTA ЕСЛИ ЮЗЕР РЕШИТ ЗА ОПРЕДЕЛЕННОЕ ВРЕМЯ ПРОСИТЬ ПРЕДУПРЕЖДЕНИЕ
+# print(tmings_arr) # здесь те времена что преобразованы окончательно !!!НУЖНО ЕЩЕ ПОРАБОТАТЬ С TIMEDELTA ЕСЛИ ЮЗЕР РЕШИТ ЗА ОПРЕДЕЛЕННОЕ ВРЕМЯ ПРОСИТЬ ПРЕДУПРЕЖДЕНИЕ
 
 '''
 async def noon_print(mes):

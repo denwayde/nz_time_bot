@@ -7,7 +7,7 @@ import re
 
 
 resp = requests.get(
-    "http://api.aladhan.com/v1/calendarByCity/2023/3?city=Москва&country=Россия&method=14&school=1")
+    "http://api.aladhan.com/v1/calendarByCity/2023/4?city=Уфа&country=Россия&method=14&school=1")
 
 tz_moscow = pytz.timezone("Europe/Moscow")
 
@@ -16,14 +16,16 @@ tz_moscow = pytz.timezone("Europe/Moscow")
 
 # resp.json()['data'][21]['meta']['timezone'] timezonechik
 # resp.json()['data'][21]['date']['hijri']['holidays']
-dt_str = resp.json()['data'][21]['date']['gregorian']['date']
+dt_str = resp.json()['data'][17]['date']['gregorian']['date']
 # preobrazovannaya data которую будем интегрировать в БД
 dt_str_conv = dt.strptime(dt_str, '%d-%m-%Y')
 # print(dt_str_conv.date() == dt.now().date())
 
 
 timings = resp.json()['data'][21]['timings']
-# print(timings)
+
+print(timings)
+
 tmings_arr = []
 delta_time = dt.now(tz_moscow).hour-dt.now().hour
 

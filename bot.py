@@ -7,7 +7,6 @@ from config_reader import config
 from db import delete_or_insert_data as di_d, select_data, insert_many
 import requests
 from datetime import datetime as dt, timedelta
-import time
 import json
 import pytz
 import re
@@ -81,7 +80,7 @@ async def choosen_mazhab_handler(message: types.Message, state: FSMContext):
     if user_data["chosen_delta"] == "За час до окончания":
         time_delta_minutes = -60
     elif user_data["chosen_delta"] == "За полчаса до окончания":
-        time_delta_minutes = -30  #TUT MOGUT BIT PROBLEMI
+        time_delta_minutes = -30  # TUT MOGUT BIT PROBLEMI
 
     mazh = 1
     if user_data['chosen_mazhab'] == "Шафии":
@@ -95,28 +94,33 @@ async def choosen_mazhab_handler(message: types.Message, state: FSMContext):
     if resp.json()['code'] == 200:
         await message.answer(f"Вы выбрали напоминание {message.text}. Настройки завершены. Бот будет напоминать ", reply_markup=types.ReplyKeyboardRemove())
         timings_data = []
+        timezone = resp.json()['data'][0]['meta']['timezone']
+        tz_moscow = pytz.timezone(timezone)
+        delta_time = dt.now(tz_moscow).hour-dt.now().hour
         for z in resp.json()['data']:
             times_arr = []
             for v in z['timings']:
                 if v != 'Sunrise' and v != 'Imsak' and v != 'Midnight' and v != 'Firstthird':
                     times_for_nz = z['timings'][v]
-                    obj_times_for_nz = re.search(r'\d\d\:\d\d', times_for_nz)
+                    
+                    obj_times_for_nz = re.search(r'(\d\d)\:(\d\d)', times_for_nz)
 
-                    times_arr.append(obj_times_for_nz[0])
+                    dt_obj = dt(dt.now().year, dt.now().month, dt.now().day, int(obj_times_for_nz[1]), int(obj_times_for_nz[2]))
+
+                    d = dt_obj + timedelta(hours=delta_time, minutes=time_delta_minutes)
+                    times_arr.append(d.strftime('%H:%M'))
 
             # ОБРАБОТКА ДАТЫ В НУЖНЫЙ ФОРМАТ
             dt_str = z['date']['gregorian']['date']
             dt_str_conv = dt.strptime(dt_str, '%d-%m-%Y').date()
 
             # СОЗДАНИЕ СПИСКА ДЛЯ МАССИВА
-            mem_tuple = tuple((message.chat.id, json.dumps(times_arr), z['meta']
-                               ['timezone'], str(dt_str_conv), json.dumps(z['date']['hijri']['holidays'])))
+            mem_tuple = tuple((message.chat.id, json.dumps(times_arr), timezone, str(dt_str_conv), json.dumps(z['date']['hijri']['holidays'])))
             # ДОБАВЛЕНИЕ СПИСКА В МАССИВ
             timings_data.append(mem_tuple)
             mem_tuple = ()
 
-        insert_many(
-            "INSERT INTO user_timings(telega_id, timings, timezone, date, holidays) VALUES(?, ?, ?, ?, ?);", timings_data)
+        insert_many("INSERT INTO user_timings(telega_id, timings, timezone, date, holidays) VALUES(?, ?, ?, ?, ?);", timings_data)
         print("Inserted")
     else:
         await message.answer("Что-то пошло не так. Возможно вы опечатались в названии своей страны или города или сервер временно недоступен. Попробуйте повторить процедуру натройки.")
@@ -132,13 +136,7 @@ async def send_random_value(callback: types.CallbackQuery):'''
 #     await message.answer(message.text)
 
 
-async def print_data(dp):
-    users = select_data(
-        "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
-    print(users[0])
-
-
 if __name__ == '__main__':
     executor.start_polling(
-        dispatcher=dp, skip_updates=True, on_startup=print_data)
+        dispatcher=dp, skip_updates=True)
 # https://aiogram.ru/?p=33 - ссыль на кнопки
