@@ -32,18 +32,27 @@ resp = requests.get(
 telega_id = 123456789
 timings_data = []
 timezone = resp.json()['data'][0]['meta']['timezone']#TIMEZONE
+times_arr = []
+
+
+tz_moscow = pytz.timezone(timezone)
+delta_time = dt.now(tz_moscow).hour-dt.now().hour
+time_delta_minutes = 0
 
 for z in resp.json()['data']:
-
-    times_arr = []
+    tmings_arr = []
     for v in z['timings']:
         if v != 'Sunrise' and v != 'Imsak' and v != 'Midnight' and v != 'Firstthird':
             times_for_nz = z['timings'][v]
             #print(times_for_nz)
             obj_times_for_nz = re.search(r'(\d\d)\:(\d\d)', times_for_nz)
-            #print(obj_times_for_nz[0])
+            #print(obj_times_for_nz[1] + '--' + obj_times_for_nz[1]) тут мы получаем времена из АПИ
+            dt_obj = dt(dt.now().year, dt.now().month, dt.now().day, int(obj_times_for_nz[1]), int(obj_times_for_nz[2]))
 
-            times_arr.append(obj_times_for_nz[0])
+            d = dt_obj + timedelta(hours=delta_time, minutes=time_delta_minutes)
+            tmings_arr.append(d.strftime('%H:%M'))
+            #times_arr.append(obj_times_for_nz[0])
+    print(tmings_arr)#PROBLEMA RESHENA. TEPER SDELAY IZ ETOGO FUNKCIU I SDELAY MODUL FUNCTIONS
     
 '''
     # ОБРАБОТКА ДАТЫ В НУЖНЫЙ ФОРМАТ
@@ -85,7 +94,7 @@ for x in timings_arr_from_db:
 
     tmings_arr.append(d.strftime('%H:%M'))
 
-print(tmings_arr) # здесь те времена что преобразованы окончательно !!!НУЖНО ЕЩЕ ПОРАБОТАТЬ С TIMEDELTA ЕСЛИ ЮЗЕР РЕШИТ ЗА ОПРЕДЕЛЕННОЕ ВРЕМЯ ПРОСИТЬ ПРЕДУПРЕЖДЕНИЕ
+#print(tmings_arr) # здесь те времена что преобразованы окончательно !!!НУЖНО ЕЩЕ ПОРАБОТАТЬ С TIMEDELTA ЕСЛИ ЮЗЕР РЕШИТ ЗА ОПРЕДЕЛЕННОЕ ВРЕМЯ ПРОСИТЬ ПРЕДУПРЕЖДЕНИЕ
 
 '''
 async def noon_print(mes):
