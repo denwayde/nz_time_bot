@@ -16,7 +16,7 @@ for v in items:
         khadis = soup.find_all('p','normal')
         created_khadis = ''
         for x in khadis:
-            created_khadis = created_khadis + re.sub(r"[А-Яа-я\'\"\”]\d+(?:\b|\.)",'',x.get_text())   
+            created_khadis = created_khadis + re.sub(r"(?<=[а-яА-Я\]\}\)\'\"\”])\d+(?=[\b\.\s\,\]])",'',x.get_text())   
         if created_khadis != '':
             created_khadis = created_khadis + "\nИсточник: Хадисы. Том 1. Автор: Шамиль Аляутдинов"
             d_id("insert into khadisy(khadis) values(?);",(created_khadis, ))
