@@ -151,51 +151,47 @@ async def noon_print(mes):
 
 async def timings_from_bd():
     aioschedule.clear()
-
     timings = select_data("select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
- 
+    
     for z in timings:
         t_a = json.loads(z[2])
         if z[-1] == 0:
-            #t_a = ['04:20', '21:40', '21:45', '21:47', '14:50', '21:50', '02:58']
-            #print(t_a)
             for x in t_a:
                 if t_a.index(x) == 1:
-                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Зухр(Ойля)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Зухр(Обеденный)!\n\n")
                 elif t_a.index(x) == 2:
-                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Аср(Икенде)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Аср(Послеобеденный)!\n\n")
                 elif t_a.index(x) == 3:
-                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Магриб(Акшам)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Магриб(Вечернии)!\n\n")
                 elif t_a.index(x) == 5:
-                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Иша(Ятсы)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Прочитай Иша(Ночной)!\n\n")
         elif z[-1] == -60:
-            #t_a = ['04:20', '21:40', '21:45', '21:47', '14:50', '21:50', '02:58']
             for x in t_a:
                 if t_a.index(x) == 0:
-                    aioschedule.every().day.at(x).do(noon_print, mes=f"Через 60 минут закончится время выполнения намаза Иша(Ятсы)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Через 60 минут закончится время выполнения намаза Иша(Ночной)!\n\n")
                 elif t_a.index(x) == 2:
-                    aioschedule.every().day.at(x).do(noon_print, mes=f"Через 60 минут закончится время выполнения намаза Зухра(Ойля)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Через 60 минут закончится время выполнения намаза Зухр(Обеденный)!\n\n")
                 elif t_a.index(x) == 3:
-                    aioschedule.every().day.at(x).do(noon_print, mes=f"Через 60 минут закончится время выполнения намаза Аср(Икенде)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Через 60 минут закончится время выполнения намаза Аср(Послеобеденный)!\n\n")
                 elif t_a.index(x) == 4:
-                    aioschedule.every().day.at(x).do(noon_print, mes=f"Через 60 минут закончится время выполнения намаза Магриб(Акшам)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Через 60 минут закончится время выполнения намаза Магриб(Вечерний)!\n\n")
         elif z[-1] == -30:
-            #t_a = ['04:20', '21:40', '21:45', '21:47', '14:50', '21:50', '02:58']
             for x in t_a:
                 if t_a.index(x) == 0:
-                    aioschedule.every().day.at(x).do(noon_print, mes=f"Через 30 минут закончится время выполнения намаза Иша(Ятсы)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Через 30 минут закончится время выполнения намаза Иша(Ночной)!\n\n")
                 elif t_a.index(x) == 2:
-                    aioschedule.every().day.at(x).do(noon_print, mes=f"Через 30 минут закончится время выполнения намаза Зухра(Ойля)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Через 30 минут закончится время выполнения намаза Зухр(Обеденный)!\n\n")
                 elif t_a.index(x) == 3:
-                    aioschedule.every().day.at(x).do(noon_print, mes=f"Через 30 минут закончится время выполнения намаза Аср(Икенде)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Через 30 минут закончится время выполнения намаза Аср(Послеобеденный)!\n\n")
                 elif t_a.index(x) == 4:
-                    aioschedule.every().day.at(x).do(noon_print, mes=f"Через 30 минут закончится время выполнения намаза Магриб(Акшам)!\n")
+                    aioschedule.every().day.at(x).do(noon_print, mes="Через 30 минут закончится время выполнения намаза Магриб(Вечерний)!\n\n")
+    aioschedule.every(3).minutes.do(timings_from_bd)
+        
 
 
 
 async def scheduler():
-    aioschedule.every(5).minutes.do(timings_from_bd)
-
+    aioschedule.every(3).minutes.do(timings_from_bd)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)
