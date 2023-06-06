@@ -39,7 +39,7 @@ def select_data(selection_query, tup=()):
     global conn
     cur = conn.cursor()
     cur.execute(selection_query, tup)
-    return cur.fetchmany()
+    return cur.fetchall()
 
 # out = select_data(
 #         "select*from user_timings inner join users USING(telega_id) where date = ?", (dt.now().date(),))
@@ -49,4 +49,5 @@ def select_data(selection_query, tup=()):
 #     print(j)
 # khadis = select_data("select khadis from khadisy order by RANDOM() LIMIT 1")[0][0]
 # print(str(khadis))
-    
+# users = select_data("select*from users")
+# print(users)
