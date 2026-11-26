@@ -571,9 +571,11 @@ async def noon_print(telega_id, mes, hds):
 
 def hadis(namaz, arr):
     if namaz in arr:
-        return select_data('select khadis from khadisy order by RANDOM() LIMIT 1')[0][0]
-    else:
-        return 'Мир Вам'
+        rows = select_data('select khadis from khadisy order by RANDOM() LIMIT 1')
+        if rows:
+            return rows[0][0]
+        # таблица khadisy пуста (не запускали main.py с khadisy.epub) - шлём текст без хадиса
+    return 'Мир Вам'
 
 
 def schedule_creator(outside_timings):
