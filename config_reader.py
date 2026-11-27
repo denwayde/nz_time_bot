@@ -2,24 +2,24 @@ from pydantic import BaseSettings, SecretStr
 
 
 class Settings(BaseSettings):
-    # Желательно вместо str использовать SecretStr
-    # для конфиденциальных данных, например, токена бота
+    # It is recommended to use SecretStr instead of str
+    # for sensitive data such as the bot token
     bot_token: SecretStr
 
-    # Telegram ID администратора (команды /users и /send_all, приём сообщений от пользователей)
+    # Telegram ID of the administrator (the /users and /send_all commands,
+    # and receiving messages from users)
     admin_id: int = 1949640271
 
-    # Вложенный класс с дополнительными указаниями для настроек
+    # Nested class with extra instructions for the settings
     class Config:
-        # Имя файла, откуда будут прочитаны данные
-        # (относительно текущей рабочей директории)
+        # Name of the file the values are read from
+        # (relative to the current working directory)
         env_file = '.env'
-        # Кодировка читаемого файла
+        # Encoding of the file being read
         env_file_encoding = 'utf-8'
 
 
-# При импорте файла сразу создастся
-# и провалидируется объект конфига,
-# который можно далее импортировать из разных мест
+# When this file is imported, the config object is immediately created
+# and validated; it can then be imported from other places
 config = Settings()
 # config.bot_token.get_secret_value()

@@ -1,0 +1,24 @@
+# English hadith collection for the reminder bot.
+#
+# HOW TO USE: rename this file to khadisy.txt (or copy its contents into
+# khadisy.txt) in the project root and run: python main.py
+#
+# Format: one hadith per paragraph, paragraphs separated by a blank line.
+# Lines starting with '#' are ignored. You can freely add, edit or remove
+# hadiths - already imported texts are never duplicated.
+
+The first matter that the servant will be brought to account for on the Day of Resurrection is the prayer. If it is sound, then the rest of his deeds will be sound. And if it is defective, then the rest of his deeds will be defective. (Jami` at-Tirmidhi 413)
+
+Between a man and disbelief is his abandonment of the prayer. (Sahih Muslim 82)
+
+Whoever prays the two cool prayers - Fajr and Asr - will enter Paradise. (Sahih al-Bukhari 574)
+
+The five daily prayers, and from one Friday prayer to the next, are an expiation for whatever sins are committed in between, so long as major sins are avoided. (Sahih Muslim 233)
+
+There are five prayers which Allah has made obligatory. Whoever performs ablution for them, prays them at their proper times, and completes their bowing and prostration, has a covenant with Allah that He will admit him into Paradise. (Sunan an-Nasa'i 461)
+
+The closest a servant is to his Lord is while he is in prostration, so increase your supplications in it. (Sahih Muslim 482)
+
+The covenant that stands between us and them is the prayer, so whoever abandons it has disbelieved. (Jami` at-Tirmidhi 2621)
+
+If people knew what reward there is in the call to prayer and in standing in the first row, and found no other way to obtain it except by drawing lots, they would draw lots for it. (Sahih al-Bukhari 615)

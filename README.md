@@ -1,57 +1,60 @@
 # nz_time_bot
 
-Телеграм-бот для напоминания о выполнении намаза (времена намазов — по API [aladhan.com](https://aladhan.com/prayer-times-api), метод 14 — ДУМ России).
+Telegram bot that reminds Muslims to perform their daily prayers (prayer times come from the [aladhan.com](https://aladhan.com/prayer-times-api) API, method 14).
 
-## Возможности
+## Features
 
-- Первичная настройка: страна, город, мазхаб (Ханафи/Шафии), время напоминания:
-  - в момент наступления времени намаза;
-  - за 30 минут до окончания;
-  - за час до окончания.
-- Напоминание в нужное время с хадисом (или без него — настраивается командами `/set_hadis_to_time` и `/del_hadis_from_time`).
-- Кнопка «Времена намазов на сегодня» — все пять времён намаза на текущий день.
-- `/change_settings` — изменить страну/город/мазхаб/время напоминания.
-- `/delete_user` — удалить свои данные из базы бота.
-- `/send_message_to_admin` — написать администратору.
-- Для администратора: `/users` — список пользователей, `/send_all` — рассылка всем.
+- Initial setup: country, city, madhhab (Hanafi / Shafi'i), reminder time:
+  - at the moment the prayer time starts;
+  - 30 minutes before the prayer time ends;
+  - 1 hour before the prayer time ends.
+- A reminder at the right time with a hadith (or without one - configurable via the `/set_hadis_to_time` and `/del_hadis_from_time` commands).
+- The "Today's prayer times" button - all five prayer times for the current day.
+- `/change_settings` - change country/city/madhhab/reminder time.
+- `/delete_user` - delete your data from the bot's database.
+- `/send_message_to_admin` - write to the administrator.
+- For the administrator: `/users` - list of users, `/send_all` - mailing to all users.
 
-## Установка
+## Installation
 
-1. Клонировать репозиторий и установить зависимости (нужен Python 3.8-3.11):
+1. Clone the repository and install the dependencies (Python 3.8-3.11 is required):
 
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Создать файл `.env` рядом с `bot.py`:
+2. Create a `.env` file next to `bot.py`:
 
 ```
-BOT_TOKEN=токен_вашего_бота_от_BotFather
-ADMIN_ID=ваш_telegram_id   # необязательно, по умолчанию зашит ID первого админа
+BOT_TOKEN=your_bot_token_from_BotFather
+ADMIN_ID=your_telegram_id   # optional, defaults to the ID of the first admin
 ```
 
-3. Запустить бота:
+3. Start the bot:
 
 ```bash
 python bot.py
 ```
 
-## Импорт хадисов
+The SQLite database (`nzt.db`) is created automatically on the first start - the tables are initialized by the bot itself, no manual setup is needed.
 
-Хадисы хранятся в таблице `khadisy` базы SQLite (`nzt.db`). Разовый импорт из книги `khadisy.epub` (положить файл в корень проекта):
+## Importing hadiths
+
+Hadiths are stored in the `khadisy` table of the SQLite database (`nzt.db`). Recommended import source: a plain-text file `khadisy.txt` (one hadith per paragraph, paragraphs separated by a blank line). A starter collection is provided in `khadisy_en.txt` - rename or copy it to `khadisy.txt`:
 
 ```bash
 python main.py
 ```
 
-Повторный запуск не создаёт дубликаты.
+Re-running the script does not create duplicates. The legacy Russian book `khadisy.epub` is also supported as an import source.
 
-## Структура
+## Structure
 
-| Файл | Назначение |
+| File | Purpose |
 | --- | --- |
-| `bot.py` | логика бота, FSM-настройки, планировщик напоминаний |
-| `db.py` | работа с SQLite (`nzt.db`), строки читаются по именам колонок |
-| `config_reader.py` | конфиг из `.env` (токен бота, ID администратора) |
-| `main.py` | разовый импорт хадисов из `khadisy.epub` |
-| `*_test.py`, `data_test.json` | черновые тестовые/отладочные файлы |
+| `bot.py` | bot logic, FSM setup flow, reminder scheduler (English UI) |
+| `db.py` | SQLite work (`nzt.db`), automatic table initialization, rows are read by column names |
+| `config_reader.py` | config from `.env` (bot token, admin ID) |
+| `main.py` | one-off hadith import from `khadisy.txt` (recommended) or `khadisy.epub` |
+| `khadisy_en.txt` | starter English hadith collection for the import |
+| `*_test.py`, `data_test.json` | draft test/debug files |
